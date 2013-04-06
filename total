@@ -41,8 +41,9 @@ end
 
 class CurrencyTotalizer
     def initialize; @currencies = {}; end
-    def add(s)
-        i = s.index(/-?\d/)
+    def add(s_)
+        s = s_.sub('¼', '.25').sub('½', '.5').sub('¾', '.75')
+        i = s.index(/-?\.?\d/)
         currency = s[0..(i-1)]
         value    = s[i..-1].to_f
         @currencies[currency] = (@currencies[currency] || 0) + value
@@ -51,12 +52,12 @@ class CurrencyTotalizer
         @currencies.map { |k,v|
             sv = (v == v.round ? v.to_i.to_s : v.to_s)
             k + sv
-        }.join('+')
+        }.join(',')
     end
 end
 
 def select_totalizer(s)
-    currencies = /^[A-Z]*?[$¥]-?\d+$/
+    currencies = /^[A-Z]*?[$¥]-?[\d¼½¾]+$/
     case s
     when /^-?[\d.]+$/   then NumberTotalizer
     when /^-?\d+:\d\d$/ then TimeTotalizer
